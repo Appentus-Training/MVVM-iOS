@@ -10,9 +10,11 @@ import UIKit
 class GetApiDemoViewController: UIViewController {
     
     @IBOutlet weak var EmployeeListTableView: UITableView!
-  
+    
     var userListArr: [UserDetail] = []
-
+    
+    let getApiViewModel = GetApiDemoViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -23,7 +25,7 @@ class GetApiDemoViewController: UIViewController {
     }
     
     func initViews() {
-        fetchUseerList()
+        fetchUserList()
     }
     
 }
@@ -31,7 +33,7 @@ class GetApiDemoViewController: UIViewController {
 // MARK: Tableview Delegates And Datasource
 
 extension GetApiDemoViewController: UITableViewDelegate, UITableViewDataSource {
-   
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -58,19 +60,16 @@ extension GetApiDemoViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension GetApiDemoViewController {
     
-    func fetchUseerList() {
-        
-        let resource = UserListResource()
-        
-        resource.getUserList { result, error in
+    func fetchUserList() {
+        Loader.shared.show()
+        getApiViewModel.fetchUsers { users, error in
+            Loader.shared.hide()
             if let error = error {
                 debugPrint(error)
                 self.showAlert(with: error)
             } else {
-                if let resultVal = result {
-                    self.userListArr = resultVal.data
-                    self.EmployeeListTableView.reloadData()
-                }
+                self.userListArr = users ?? []
+                self.EmployeeListTableView.reloadData()
             }
         }
     }
